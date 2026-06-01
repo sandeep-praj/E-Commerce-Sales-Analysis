@@ -1,0 +1,78 @@
+-- E-commerce sales analysis
+
+-- Create database
+create database ecommerce_sales;
+-- use ecommerce_sales
+use ecommerce_sales;
+
+-- Show the dataset
+SELECT * FROM ecommerce_sales.`sales dataset_01`;
+-- Total order
+select count(`Order ID`) as total_order from ecommerce_sales.`sales dataset_01`;
+
+-- count 
+select count(*) from ecommerce_sales.`sales dataset_01`;
+
+-- Handle missing value
+with miss_data as (
+select  *, row_number() over (partition by 'OrderID', Amount,Profit, Quantity, Category, 'Sub-Category', PaymentMode, 
+'OrderDate', CustomerName, State, City, 'Year-Month' order by 'OrderID' asc) as chec
+from ecommerce_sales.`sales dataset_01`
+)
+select * from miss_data where chec > 1;
+														-- Business need
+
+-- 1. Top 5 best-selling Category in 2024
+select Category,Total_Revenue as best_selling from ecommerce_sales.`sales dataset_01` 
+where `Year-Month` like '2024%' order by best_selling desc limit 5;
+
+-- 2. Which Category with the lowest sales
+select Category, sum(Total_Revenue) as lowest_sal from
+ecommerce_sales.`sales dataset_01`
+group by Category order by lowest_sal asc;
+
+-- 3. Total sales in 2024
+SELECT SUM(Total_Revenue) AS total_sales_2024
+FROM ecommerce_sales.`sales dataset_01`
+WHERE `Year-Month` LIKE '2024%';
+
+-- 4. Total profit 2024
+select  sum(profit) as total_profit from ecommerce_sales.`sales dataset_01`
+where `Year-Month` like '2024%';
+
+-- 5. top 5 Category generating the highest profit
+select sum(Profit),  Category as high_prfit from ecommerce_sales.`sales dataset_01`
+group by Category order by high_profit desc;
+
+-- Top 5 Sub-Category generating the highest profit
+select `Sub-Category` as sub_category, sum(Profit) as high_profit
+from ecommerce_sales.`sales dataset_01` 
+group by `Sub-Category` order by high_profit desc limit 5;
+
+-- 6. which category has the highest number of orders
+select Category, COUNT(`Order ID`) as order_count from ecommerce_sales.`sales dataset_01` 
+group by Category order by order_count desc limit 1 ;
+
+-- 8. which payment mode genrating the highest revenue
+select PaymentMode as payment_mode, sum(Total_Revenue) as highest_revenue  from ecommerce_sales.`sales dataset_01`
+group by PaymentMode order by highest_revenue desc limit 1;
+
+-- 9.Top 10 State, City has the highest sales
+select State, City, sum(Total_Revenue) as high from ecommerce_sales.`sales dataset_01`
+group by State,City order by high desc limit 10;
+
+-- 10 Top 5 state has the highest num of orders
+select State, count(`Order Id`) as num_order from ecommerce_sales.`sales dataset_01`
+group by State order by num_order desc limit 5;
+
+-- 11. Top 5 lowest-selling category in 2024
+select Category, sum(Total_Revenue) as lowest_selling from ecommerce_sales.`sales dataset_01`
+where `Year-Month` like '2024%' group by Category order by lowest_selling;
+
+-- 12 Total Order and profit in 2024 
+select count(`Order ID`) as total_order ,sum(Profit) as total_profit from ecommerce_sales.`sales dataset_01` 
+where `Year-Month` like '2024%';
+-- Top Sales
+select `Sub-Category`, sum(Total_Revenue) as highest from 
+ecommerce_sales.`sales dataset_01` where `Year-Month`LIKE '2025%'  group by `Sub-Category` order by highest desc limit 5;
+
